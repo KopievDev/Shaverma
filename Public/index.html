@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShavaStreet Products</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.css">
+    <style>
+        .product-card {
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #ddd;
+            margin: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .product-image {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Продукты ShavaStreet</h1>
+    <div class="carousel"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel/slick/slick.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const carouselContainer = document.querySelector('.carousel');
+            const apiUrl = 'https://shavastreet.ru/api/v1/products';
+
+            // Заголовки для авторизации
+            const headers = new Headers();
+            headers.append('Authorization', 'Bearer yO+T1OZaLCpKRdp2azUr1A==');
+
+            // Параметры запроса
+            const requestOptions = {
+                method: 'GET',
+                headers: headers
+            };
+
+            // Загрузка данных с API с заголовком авторизации
+            fetch(apiUrl, requestOptions)
+                .then(response => response.json())
+                .then(data => {
+                    // Генерация HTML для каждого продукта
+                    const productCards = data.map(product => {
+                        return `
+                            <div class="product-card">
+                                <img class="product-image" src="${product.imageUrl}" alt="${product.name}">
+                                <h3>${product.name}</h3>
+                                <p>${product.desc}</p>
+                                <p>Цена: ${product.price} руб.</p>
+                            </div>
+                        `;
+                    });
+
+                    // Вставка HTML в карусель
+                    carouselContainer.innerHTML = productCards.join('');
+
+                    // Инициализация карусели с помощью Slick Carousel
+                    $(carouselContainer).slick({
+                        slidesToShow: 3,
+                        slidesToScroll: 1,
+                        autoplay: true,
+                        autoplaySpeed: 3000,
+                        responsive: [
+                            {
+                                breakpoint: 768,
+                                settings: {
+                                    slidesToShow: 2
+                                }
+                            },
+                            {
+                                breakpoint: 480,
+                                settings: {
+                                    slidesToShow: 1
+                                }
+                            }
+                        ]
+                    });
+                })
+                .catch(error => {
+                    console.error('Ошибка при запросе данных:', error);
+                });
+        });
+    </script>
+</body>
+</html>
