@@ -13,6 +13,7 @@ public func configure(_ app: Application) async throws {
             defaultFile: "index.html"
         )
     )
+    app.addCORSMiddleware()
     app.http.server.configuration.hostname = "shavastreet.ru"
     app.http.server.configuration.tlsConfiguration = .makeServerConfiguration(
         certificateChain: [.certificate(try .init(file: "/etc/ssl/shavastreet/fullchain.pem", format: .pem))], // Путь к вашему fullchain.pem
