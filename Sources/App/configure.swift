@@ -2,6 +2,7 @@ import NIOSSL
 import Fluent
 import FluentSQLiteDriver
 import Vapor
+import NIOTLS
 
 // configures your application
 public func configure(_ app: Application) async throws {
@@ -12,7 +13,12 @@ public func configure(_ app: Application) async throws {
             defaultFile: "index.html"
         )
     )
-
+    app.addCORSMiddleware()
+    app.http.server.configuration.hostname = "shavastreet.ru"
+    app.http.server.configuration.tlsConfiguration = .makeServerConfiguration(
+        certificateChain: [.certificate(try .init(file: "/etc/ssl/shavastreet/fullchain.pem", format: .pem))], // Путь к вашему fullchain.pem
+            privateKey: .file("/etc/ssl/shavastreet/private.pem") // Путь к вашему privkey.pem
+        )
     app.databases.use(.sqlite(.file("db.sqlite")), as: .sqlite)
 
     app.migrations.add(User.Migration())
