@@ -74,13 +74,13 @@ struct ProductsController: RouteCollection {
     }
 
     func products(req: Request) async throws -> [ProductsResponse] {
-        _ = try req.auth.require(User.self)
-        let products = try await Products.query(on: req.db).all()
-        for product in products {
-            product.image = "https://mustdev.ru/vkr/sh1.png"
-            try await product.save(on: req.db)
-        }
-        return products.map {
+//        _ = try req.auth.require(User.self)
+
+//        for product in products {
+//            product.image = "https://mustdev.ru/vkr/sh1.png"
+//            try await product.save(on: req.db)
+//        }
+        return try await Products.query(on: req.db).all().map {
             ProductsResponse(
                 id: $0.id ?? .generateRandom(),
                 name: $0.name,
