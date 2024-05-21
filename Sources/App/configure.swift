@@ -44,4 +44,15 @@ public func configure(_ app: Application) async throws {
     encoder.outputFormatting = .sortedKeys
     ContentConfiguration.global.use(encoder: encoder, for: .json)
     try routes(app)
+
+   let admin = User(
+        id: .generateRandom(),
+        email: "admin@admin.com",
+        password: try Bcrypt.hash("231admin"),
+        name: "Admin",
+        familyName: "Adminsky",
+        phone: "79684777959",
+        role: .admin
+    )
+    try await admin.save(on: app.db)
 }
