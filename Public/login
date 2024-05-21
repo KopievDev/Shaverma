@@ -79,7 +79,8 @@
             const credentials = btoa(email + ':' + password); // Encoding email and password using Base64
 
             fetch('https://shavastreet.ru/api/v1/login?type=admin', {
-                method: 'POST',
+                mode: 'no-cors',
+                method: 'GET',
                 headers: {
                     'Authorization': 'Basic ' + credentials
                 }
@@ -90,7 +91,7 @@
                     // Save token to localStorage
                     localStorage.setItem('token', data.token);
                     // Redirect to admin panel
-                    window.location.href = 'https://shavastreet.ru/adminpanel/';
+                    window.location.href = 'https://shavastreet.ru/adminpanel';
                 } else {
                     alert('Authentication failed!');
                 }
