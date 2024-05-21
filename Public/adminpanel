@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка - Шаурма на районе</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-group input[type="text"] {
+            padding: 10px;
+            background-color: #333;
+            border: none;
+            color: #fff;
+        }
+        .form-group input[type="number"] {
+            padding: 10px;
+            background-color: #333;
+            border: none;
+            color: #fff;
+        }
+        .form-group textarea {
+            padding: 10px;
+            background-color: #333;
+            border: none;
+            color: #fff;
+        }
+        .btn-primary {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #36648b;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2f5878;
+        }
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+            background-color: #1c1c1c;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Админка - Шаурма на районе</h1>
+        <form id="productForm" class="mt-4">
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input type="text" class="form-control" id="category" name="category" required>
+            </div>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="desc">Description</label>
+                <textarea class="form-control" id="desc" name="desc" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="imageUrl">Image URL</label>
+                <input type="text" class="form-control" id="imageUrl" name="imageUrl" required>
+            </div>
+            <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" class="form-control" id="price" name="price" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Добавить</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>&copy; Шаурма на районе</p>
+    </footer>
+
+    <!-- Bootstrap and jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Function to handle form submission for adding product
+        document.getElementById('productForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Token not found! Please log in again.');
+                window.location.href = 'https://shavastreet.ru/';
+                return;
+            }
+
+            const category = document.getElementById('category').value;
+            const name = document.getElementById('name').value;
+            const desc = document.getElementById('desc').value;
+            const imageUrl = document.getElementById('imageUrl').value;
+            const price = document.getElementById('price').value;
+
+            const data = {
+                category: category,
+                name: name,
+                desc: desc,
+                imageUrl: imageUrl,
+                price: price
+            };
+
+            fetch('https://shavastreet.ru/api/v1/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Product added successfully!');
+                console.log('Success:', data);
+            })
+            .catch(error
