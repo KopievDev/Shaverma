@@ -67,7 +67,7 @@ struct AppAdminController: RouteCollection {
                 responseDescription: "Success response"
             )
 
-        admin.delete(":type", use: appList)
+        admin.delete(":type", use: deleteAppWithType)
             .openAPI(
                 tags: .init(name: "App Console"),
                 summary: "Удалить приложение",
