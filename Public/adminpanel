@@ -114,7 +114,7 @@
                 name: name,
                 desc: desc,
                 imageUrl: imageUrl,
-                price: price
+                price: Number(price)
             };
 
             fetch('https://shavastreet.ru/api/v1/products', {
