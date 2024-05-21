@@ -37,6 +37,7 @@ public func configure(_ app: Application) async throws {
     app.migrations.add(Order.Migration())
     app.migrations.add(OrderSequence.Migration())
     app.migrations.add(OrderItem.Migration())
+    app.migrations.add(Setting.Migration())
     try await app.autoMigrate()
 
     let encoder = JSONEncoder()

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="checkbox"] {
+            padding: 10px;
+            background-color: #333;
+            border: none;
+            color: #fff;
+        }
+        .form-check-label {
+            padding-left: 1.5em;
+        }
+        .btn-primary {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #36648b;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #2f5878;
+        }
+        footer {
+            margin-top: 50px;
+            text-align: center;
+            padding: 20px;
+            background-color: #1c1c1c;
+            color: #ccc;
+        }
+        .subtitle {
+            font-size: 1.2em;
+            color: #bbb;
+            text-align: center;
+            margin-top: 10px; /* Добавлен вертикальный отступ */
+            margin-bottom: 20px;
+        }
+        .app-image {
+            display: block;
+            margin: 0 auto;
+            width: 100px;
+            height: 100px;
+            border-radius: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Admin Panel</h1>
+        <img id="appImage" class="app-image" src="https://mustdev.ru/adminka/icons8-apple-app-store.svg" alt="App Image">
+        <p id="subtitle" class="subtitle">Админка приложения</p>
+        <form id="adminForm" class="mt-4">
+            <div class="form-group">
+                <label for="paywall">Paywall</label>
+                <input type="text" class="form-control" id="paywall" name="paywall" required>
+            </div>
+            <div class="form-group">
+                <label for="black_paywall">Black Paywall</label>
+                <input type="text" class="form-control" id="black_paywall" name="black_paywall" required>
+            </div>
+            <div class="form-group">
+                <label for="review_version">Review Version</label>
+                <input type="text" class="form-control" id="review_version" name="review_version">
+            </div>
+            <input type="hidden" id="type" name="type" value="">
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="is_need_rate" name="is_need_rate">
+                <label class="form-check-label" for="is_need_rate">Is Need Rate</label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Update</button>
+        </form>
+    </div>
+
+    <footer>
+        <p>MustDev, Developer @Ikopiev</p>
+    </footer>
+
+    <!-- Bootstrap and jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+       // Function to fetch initial data with Bearer token
+        function fetchDataWithToken(url, token) {
+            return fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        }
+
+        // Function to populate form with data from GET request
+        function populateForm(data) {
+            document.getElementById('paywall').value = data.paywall || '';
+            document.getElementById('black_paywall').value = data.black_paywall || '';
+            document.getElementById('review_version').value = data.review_version || '';
+            document.getElementById('type').value = data.type || ''; // Скрытое поле для хранения значения type
+            document.getElementById('is_need_rate').checked = data.is_need_rate || false;
+            document.getElementById('subtitle').textContent = data.title || 'Админка приложения';
+            document.getElementById('appImage').src = data.appImage || 'https://mustdev.ru/adminka/icons8-apple-app-store.svg';
+        }
+
+        // Parse URL parameters
+        function parseUrlParams() {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const type = urlParams.get('type');
+            return type;
+        }
+
+        // GET request to fetch initial data
+        const type = parseUrlParams(); // Получаем значение параметра type из URL
+        const token = localStorage.getItem('token'); // Получаем токен из localStorage
+
+        if (token) {
+            const url = `https://shavastreet.ru/api/v1/settings/${type}`;
+            fetchDataWithToken(url, token)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    populateForm(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching settings:', error);
+                    document.getElementById('subtitle').textContent = 'Админка приложения';
+                });
+        } else {
+            alert('Token not found! Please log in again.');
+            window.location.href = 'https://shavastreet.ru/';
+        }
+
+        // Handling form submission for PUT request
+        document.getElementById('adminForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const paywall = document.getElementById('paywall').value;
+            const black_paywall = document.getElementById('black_paywall').value;
+            const review_version = document.getElementById('review_version').value;
+            const type = document.getElementById('type').value;
+            const is_need_rate = document.getElementById('is_need_rate').checked;
+
+            const data = {
+                paywall: paywall,
+                black_paywall: black_paywall,
+                type: type,
+                is_need_rate: is_need_rate
+            };
+
+            if (review_version) {
+                data.review_version = review_version;
+            }
+
+            fetch('https://shavastreet.ru/api/v1/settings/update', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('Update successful!');
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                alert('Update failed!');
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>

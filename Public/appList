@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            padding-top: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .app-container {
+            margin-bottom: 20px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .app-container img {
+            width: 100px;
+            height: 100px;
+            border-radius: 16px;
+        }
+        .app-title {
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">App List</h1>
+        <div id="appList" class="row justify-content-center"></div>
+    </div>
+
+    <!-- Bootstrap and jQuery JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Function to fetch data with Bearer token
+        function fetchDataWithToken(url, token) {
+            return fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        }
+
+        // Function to render app data
+        function renderApps(apps) {
+            const appList = document.getElementById('appList');
+
+            apps.forEach(app => {
+                const appContainer = document.createElement('div');
+                appContainer.className = 'col-md-4 app-container';
+                appContainer.innerHTML = `
+                    <img src="${app.appImage}" alt="App Image">
+                    <p class="app-title">${app.title}</p>
+                `;
+                appContainer.addEventListener('click', function() {
+                    const type = encodeURIComponent(app.type);
+                    window.location.href = `https://shavastreet.ru/appsettings?type=${type}`;
+                });
+                appList.appendChild(appContainer);
+            });
+        }
+
+        // Fetch app data with token
+        const token = localStorage.getItem('token'); // Получаем токен из localStorage
+        fetch('https://shavastreet.ru/api/v1/settings', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            renderApps(data);
+        })
+        .catch(error => {
+            console.error('Error fetching app data:', error);
+        });
+    </script>
+</body>
+</html>

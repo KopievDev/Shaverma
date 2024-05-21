@@ -12,4 +12,5 @@ func routes(_ app: Application) throws {
     try app.register(collection: AdminController(tokenProtected: tokenProtected))
     try app.register(collection: PromoController(tokenProtected: tokenProtected))
     try app.register(collection: OrderController(tokenProtected: tokenProtected))
+    try app.register(collection: AppAdminController(tokenProtected: tokenProtected))
 }
