@@ -66,23 +66,34 @@ struct AppAdminController: RouteCollection {
                 responseContentType: .application(.json),
                 responseDescription: "Success response"
             )
+
+        admin.delete(":type", use: appList)
+            .openAPI(
+                tags: .init(name: "App Console"),
+                summary: "Удалить приложение",
+                description: "Удалить приложение по типу",
+                headers: .all(of: .type(Headers.AccessToken.self)),
+                contentType: .application(.json),
+                response: .type([SettingResponse].self),
+                responseContentType: .application(.json),
+                responseDescription: "Success response"
+            )
     }
 
     func appList(req: Request) async throws -> [SettingResponse] {
         let user = try req.auth.require(User.self)
-//        guard user.role == .admin else {
-//            throw Abort(.forbidden)
-//        }
-        
+        guard user.role == .admin else {
+            throw Abort(.forbidden)
+        }
         return try await Setting.query(on: req.db).all().compactMap(SettingResponse.init)
     }
 
     func createApp(req: Request) async throws -> AppResponse {
         let user = try req.auth.require(User.self)
         let request = try req.content.decode(AppResponse.self)
-//        guard user.role == .admin else {
-//            throw Abort(.forbidden)
-//        }
+        guard user.role == .admin else {
+            throw Abort(.forbidden)
+        }
         let setting = request.make()
         try await setting.save(on: req.db)
         return AppResponse(setting: setting)
@@ -90,9 +101,9 @@ struct AppAdminController: RouteCollection {
 
     func getAppWithType(req: Request) async throws -> SettingResponse {
         let user = try req.auth.require(User.self)
-//        guard user.role == .admin else {
-//            throw Abort(.forbidden)
-//        }
+        guard user.role == .admin else {
+            throw Abort(.forbidden)
+        }
         guard let type = req.parameters.get("type") else {
             throw Abort(.custom(code: 404, reasonPhrase: "Не указан тип"))
         }
@@ -107,13 +118,34 @@ struct AppAdminController: RouteCollection {
         return SettingResponse(setting: setting)
     }
 
+    func deleteAppWithType(req: Request) async throws -> SettingResponse {
+        let user = try req.auth.require(User.self)
+        guard user.role == .admin else {
+            throw Abort(.forbidden)
+        }
+        guard let type = req.parameters.get("type") else {
+            throw Abort(.custom(code: 404, reasonPhrase: "Не указан тип"))
+        }
+        let setting = try await Setting
+            .query(on: req.db)
+            .filter(\.$type == type)
+            .first()
+
+        guard let setting else {
+            throw Abort(.custom(code: 404, reasonPhrase: "Нет такого типа"))
+        }
+        let response = SettingResponse(setting: setting)
+        try await setting.delete(on: req.db)
+        return response
+    }
+
     func updateAppData(req: Request) async throws -> SettingResponse {
         let user = try req.auth.require(User.self)
         let request = try req.content.decode(SettingRequest.self)
 
-//        guard user.role == .admin else {
-//            throw Abort(.forbidden)
-//        }
+        guard user.role == .admin else {
+            throw Abort(.forbidden)
+        }
 
         let setting = try await Setting
             .query(on: req.db)
