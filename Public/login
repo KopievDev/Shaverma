@@ -79,7 +79,6 @@
             const credentials = btoa(email + ':' + password); // Encoding email and password using Base64
 
             fetch('https://shavastreet.ru/api/v1/login?type=admin', {
-                mode: 'no-cors',
                 method: 'GET',
                 headers: {
                     'Authorization': 'Basic ' + credentials
